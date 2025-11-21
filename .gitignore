@@ -1,0 +1,73 @@
+# Aureon AGI – full ignore file for backend, frontend, logs, cache, and environment protection.
+
+# ===========================
+# Node / Backend
+# ===========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# ===========================
+# Environment / Secrets
+# ===========================
+.env
+.env.*
+*.env.local
+config.local.json
+secret.key
+keys/
+apikeys/
+
+# ===========================
+# Build Artifacts
+# ===========================
+dist/
+build/
+coverage/
+.tmp/
+.cache/
+.vercel/
+.render/
+
+# ===========================
+# Runtime Files
+# ===========================
+*.pid
+*.seed
+*.pid.lock
+tmp/
+temp/
+
+# ===========================
+# OS / Editor
+# ===========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===========================
+# Frontend
+# ===========================
+*.map
+*.bundle.js
+*.bundle.js.map
+
+# ===========================
+# Logs & Memory Dumps
+# ===========================
+*.stackdump
+*.dmp
+dump.rdb
+
+# ===========================
+# Aureon Memory (optional)
+# ===========================
+# Uncomment if you implement real local persistence
+# /data/memory/
