@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aureon AGI Interface</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #040816 0%, #050b1d 30%, #050608 100%);
+      color: #f5f7ff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .app-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 8px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 4px;
+    }
+    .brand {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+    .brand span {
+      font-weight: 300;
+      opacity: 0.7;
+      font-size: 12px;
+      text-transform: none;
+    }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    .status-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 11px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.09), transparent 45%),
+                  radial-gradient(circle at bottom right, rgba(94, 234, 212, 0.10), transparent 45%),
+                  rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 18px 60px rgba(15, 23, 42, 0.9);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    #chat {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      scroll-behavior: smooth;
+    }
+    .msg {
+      display: flex;
+      margin-bottom: 4px;
+    }
+    .msg.user {
+      justify-content: flex-end;
+    }
+    .msg.assistant {
+      justify-content: flex-start;
+    }
+    .bubble {
+      max-width: 85%;
+      padding: 8px 11px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .msg.user .bubble {
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1220;
+      border-bottom-right-radius: 4px;
+    }
+    .msg.assistant .bubble {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      border-bottom-left-radius: 4px;
+    }
+
+    .aureon-output {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+    .aureon-text {
+      margin-bottom: 2px;
+    }
+    .aureon-metrics {
+      font-size: 11px;
+      opacity: 0.75;
+    }
+    .aureon-safety {
+      font-size: 11px;
+      color: #f97373;
+    }
+
+    .input-bar {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border-top: 1px solid rgba(30, 64, 175, 0.7);
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.94));
+    }
+    #input {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.93);
+      color: #e2e8f0;
+      font-size: 14px;
+      outline: none;
+    }
+    #input::placeholder {
+      color: rgba(148, 163, 184, 0.7);
+    }
+    #input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+    #send {
+      border-radius: 999px;
+      border: none;
+      padding: 0 16px;
+      font-size: 14px;
+      font-weight: 500;
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+      color: #052e16;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    #send:hover {
+      filter: brightness(1.05);
+    }
+
+    .footer-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 2px 0;
+      font-size: 11px;
+      opacity: 0.75;
+    }
+    .footer-controls {
+      display: flex;
+      gap: 6px;
+    }
+    .footer-btn {
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .footer-btn:hover {
+      border-color: #22c55e;
+    }
+
+    #memory-view {
+      margin-top: 4px;
+      max-height: 80px;
+      overflow-y: auto;
+      font-size: 11px;
+      padding-right: 2px;
+    }
+    .mem-item {
+      margin-bottom: 2px;
+      opacity: 0.8;
+    }
+    .mem-tags {
+      opacity: 0.6;
+      font-size: 10px;
+      margin-left: 4px;
+    }
+
+    @media (max-width: 600px) {
+      .app-shell {
+        padding: 6px;
+      }
+      .bubble {
+        max-width: 100%;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      .footer-panel {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="brand">
+        AUREON
+        <span>π → φ → e · Coherence Kernel</span>
+      </div>
+      <div class="status">
+        <div class="status-dot"></div>
+        <div class="status-pill">Kernel · Online</div>
+      </div>
+    </header>
+
+    <div class="main">
+      <div id="chat"></div>
+
+      <div class="input-bar">
+        <input id="input" type="text" placeholder="Ask Aureon anything..." autocomplete="off" />
+        <button id="send">
+          Send
+        </button>
+      </div>
+    </div>
+
+    <div class="footer-panel">
+      <div class="footer-controls">
+        <button class="footer-btn" onclick="loadAureonMemory()">Memory</button>
+        <button class="footer-btn" onclick="setAureonMode('default')">Mode: Default</button>
+        <button class="footer-btn" onclick="setAureonMode('coaching')">Coaching</button>
+        <button class="footer-btn" onclick="setAureonMode('architect')">Architect</button>
+      </div>
+      <div>
+        κ / τ / Σ metrics visible under each Aureon reply.
+      </div>
+    </div>
+    <div id="memory-view"></div>
+  </div>
+
+  <script src="frontend.js"></script>
+</body>
+</html>
